@@ -1,0 +1,25 @@
+# Node / Next artifacts (if generated here by mistake)
+node_modules/
+.next/
+dist/
+
+# Python artifacts (if any helper scripts live here)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Docker
+*.log
+*.tmp
+
+# Secrets
+.env
+.env.*
