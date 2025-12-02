@@ -10,7 +10,7 @@ services:
       - "3347:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_BASE_URL=https://www.api.vizllo.com
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://backend:8000}
     volumes:
       - ./frontend:/app
     networks:
@@ -28,7 +28,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONDONTWRITEBYTECODE=1
-      - FRONTEND_URL=https://www.vizllo.com
+      - FRONTEND_URL=https://vizllo.com
+      - FRONTEND_URLS=https://vizllo.com,https://www.vizllo.com,http://localhost:3000
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-changeme}
     volumes:
       - ./backend:/app
