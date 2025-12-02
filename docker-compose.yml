@@ -10,7 +10,7 @@ services:
       - "3347:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://backend:8000}
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-https://api.vizllo.com}
     volumes:
       - ./frontend:/app
     networks:
@@ -31,6 +31,8 @@ services:
       - FRONTEND_URL=https://vizllo.com
       - FRONTEND_URLS=https://vizllo.com,https://www.vizllo.com,http://localhost:3000
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-changeme}
+      - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN:-.vizllo.com}
+      - SESSION_COOKIE_NAME=${SESSION_COOKIE_NAME:-vizllo_session}
     volumes:
       - ./backend:/app
     networks:
