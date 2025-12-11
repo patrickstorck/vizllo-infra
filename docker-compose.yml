@@ -5,6 +5,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    user: "${HOST_UID}:${HOST_GID}"
     command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3000"]
     ports:
       - "3347:3000"
@@ -20,6 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    user: "${HOST_UID}:${HOST_GID}"
     env_file:
       - ./backend/.env.production
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
