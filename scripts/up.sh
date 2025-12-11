@@ -2,6 +2,7 @@
 set -euo pipefail
 
 STACK_FILE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/docker-compose.yml"
+FRONTEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../frontend" && pwd)"
 
 usage() {
   cat <<'EOF'
@@ -11,6 +12,7 @@ Service (default: all):
   backend | frontend | cloudflared | all
 
 Options:
+  -d, --down         Stop and remove all running services before starting
   -b, --build        Rebuild images before starting
   -n, --no-cache     Rebuild without cache (implies --build)
   -p, --pull         Pull latest base images (applies to build/up)
@@ -29,11 +31,15 @@ TARGET="all"
 BUILD=false
 NO_CACHE=false
 PULL=false
+DO_DOWN=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     backend|frontend|cloudflared|all|--all)
       TARGET="${1#--}"
+      ;;
+    -d|--down)
+      DO_DOWN=true
       ;;
     -b|--build)
       BUILD=true
@@ -41,6 +47,7 @@ while [[ $# -gt 0 ]]; do
     -n|--no-cache)
       NO_CACHE=true
       BUILD=true
+      DO_DOWN=true
       ;;
     -p|--pull)
       PULL=true
@@ -59,6 +66,22 @@ done
 SERVICE_ARGS=()
 if [[ "$TARGET" != "all" ]]; then
   SERVICE_ARGS+=("$TARGET")
+fi
+
+if [[ "$DO_DOWN" == true ]]; then
+  echo "Stopping all services (down)..."
+  docker compose -f "$STACK_FILE" down --remove-orphans
+fi
+
+if [[ "$DO_DOWN" == true || "$NO_CACHE" == true ]]; then
+  if [[ -d "$FRONTEND_DIR/.next" ]]; then
+    echo "Removing stale Next.js build cache at $FRONTEND_DIR/.next"
+    rm -rf "$FRONTEND_DIR/.next" 2>/dev/null || true
+    if [[ -d "$FRONTEND_DIR/.next" ]]; then
+      echo "Cache removal hit permission issues; removing via docker (runs as root)..."
+      docker compose -f "$STACK_FILE" run --rm --entrypoint rm frontend -rf /app/.next
+    fi
+  fi
 fi
 
 if [[ "$NO_CACHE" == true ]]; then
